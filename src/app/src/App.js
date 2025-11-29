@@ -12,7 +12,7 @@ export function App() {
     } catch (err) {
       console.error(err);
     }
-    e.target.todo.value = "";
+    e.target.reset();
   };
 
   return (

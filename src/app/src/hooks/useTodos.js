@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-
-const API_BASE = "http://localhost:8000";
+import { API_BASE } from "../configs/config";
 
 export default function useTodos() {
     const [todos, setTodos] = useState([]);
