@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import json, logging, os
-from datetime import datetime
+import logging, os
+from datetime import datetime, timezone
 from pymongo import MongoClient
-from pydantic import BaseModel, Field
+from .model import TodoInput
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class TodoListView(APIView):
             # Convert cursor to list and ObjectId to string for JSON serialization
             todos_list = []
             for todo in todos_cursor:
-                todo['id'] = str(todo['_id'])  # Convert ObjectId to string
+                todo['id'] = str(todo.pop('_id'))  # Convert ObjectId to string
                 todos_list.append(todo)
             
             return Response({"todos": todos_list}, status=status.HTTP_200_OK)
@@ -43,9 +43,7 @@ class TodoListView(APIView):
             todo["created_at"] = datetime.utcnow().replace(tzinfo=timezone.utc)
             result = db.todos.insert_one(todo)
             
-            # Return the created todo with its ID
-            todo['id'] = str(result.inserted_id)
-            return Response({"todo": todo}, status=status.HTTP_201_CREATED)
+            return Response({"id": str(result.inserted_id)}, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.exception("POST /todos failed", e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
