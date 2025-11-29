@@ -1,7 +1,13 @@
 # set base image (host OS)
-FROM python:3.8
+# Using python:3.8-buster to ensure libssl1.1 is available for MongoDB 4.4
+FROM python:3.8-buster
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+# Debian Buster is archived, update sources to use archive.debian.org
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    sed -i '/stretch-updates/d' /etc/apt/sources.list
 
 RUN apt-get -y update
 RUN apt-get install -y curl nano wget nginx git
@@ -20,8 +26,7 @@ RUN apt-get install -y mongodb-org
 # Install Yarn
 RUN apt-get install -y yarn
 
-# Install PIP
-RUN easy_install pip
+# pip is already included with Python 3.8
 
 
 ENV ENV_TYPE staging
