@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import logging
-from .service_layer import TodoService
+from .todo_service import TodoService
 
 logger = logging.getLogger(__name__)
 

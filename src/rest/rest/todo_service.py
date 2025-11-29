@@ -3,8 +3,8 @@ Service layer for business logic operations
 """
 from datetime import datetime, timezone
 from pydantic import ValidationError
-from .util_layer import get_db_connection, serialize_todos_list
-from .model import TodoInput
+from .todo_util import get_db_connection, serialize_todos_list
+from .todo_model import TodoInput
 
 
 class TodoService:
