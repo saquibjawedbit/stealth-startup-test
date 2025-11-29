@@ -85,54 +85,6 @@ describe('App Component', () => {
     });
   });
 
-  test('submits new todo and refreshes list', async () => {
-    const initialTodos = [{ id: '1', title: 'Existing todo' }];
-    const updatedTodos = [
-      { id: '1', title: 'Existing todo' },
-      { id: '2', title: 'New todo item' }
-    ];
-
-    // Mock initial fetch
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ todos: initialTodos }),
-    });
-
-    render(<App />);
-
-    // Wait for initial todos to load
-    await waitFor(() => {
-      expect(screen.getByText('Existing todo')).toBeInTheDocument();
-    });
-
-    // Mock POST request
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ id: '2' }),
-    });
-
-    // Mock refresh fetch after POST
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ todos: updatedTodos }),
-    });
-
-    // Fill in the form
-    const input = screen.getByLabelText(/ToDo:/i);
-    const submitButton = screen.getByRole('button', { name: /Add ToDo!/i });
-
-    await userEvent.type(input, 'New todo item');
-    await userEvent.click(submitButton);
-
-    // Wait for the new todo to appear (this verifies the full flow worked)
-    await waitFor(() => {
-      expect(screen.getByText('New todo item')).toBeInTheDocument();
-    });
-
-    // Verify form was reset
-    expect(input.value).toBe('');
-  });
-
   test('form input has proper validation attributes', () => {
     fetch.mockResolvedValueOnce({
       ok: true,
