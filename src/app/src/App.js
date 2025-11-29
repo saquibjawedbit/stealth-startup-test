@@ -1,16 +1,21 @@
+import { useState } from 'react';
 import './App.css';
 import useTodos from './hooks/useTodos';
 
 export function App() {
 
   const { todos, loading, error, addTodo } = useTodos();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleTodoSubmit = (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       addTodo({ title: e.target.todo.value });
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
     e.target.reset();
   };
@@ -36,10 +41,17 @@ export function App() {
         <form onSubmit={handleTodoSubmit}>
           <div>
             <label htmlFor="todo">ToDo: </label>
-            <input type="text" name="todo" />
+            <input
+              type="text"
+              name="todo"
+              required
+              minLength={1}
+              maxLength={300}
+              placeholder="Enter todo description..."
+            />
           </div>
           <div style={{ "marginTop": "5px" }}>
-            <button>Add ToDo!</button>
+            <button disabled={submitting}>Add ToDo!</button>
           </div>
         </form>
       </div>
