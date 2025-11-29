@@ -12,9 +12,8 @@ class TodoListView(APIView):
     API View for managing todo items
     """
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.todo_service = TodoService()
+    # Class-level service instance (shared across requests)
+    todo_service = TodoService()
 
     def get(self, request):
         """

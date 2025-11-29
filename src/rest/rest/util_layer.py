@@ -5,16 +5,23 @@ import os
 from pymongo import MongoClient
 
 
+# Singleton database connection
+_db_instance = None
+
+
 def get_db_connection():
     """
-    Establishes and returns a MongoDB database connection
+    Returns a singleton MongoDB database connection
     
     Returns:
         Database: MongoDB database instance
     """
-    mongo_uri = 'mongodb://' + os.environ["MONGO_HOST"] + ':' + os.environ["MONGO_PORT"]
-    client = MongoClient(mongo_uri)
-    return client['test_db']
+    global _db_instance
+    if _db_instance is None:
+        mongo_uri = 'mongodb://' + os.environ["MONGO_HOST"] + ':' + os.environ["MONGO_PORT"]
+        client = MongoClient(mongo_uri)
+        _db_instance = client['test_db']
+    return _db_instance
 
 
 def serialize_todo(todo):
@@ -25,10 +32,12 @@ def serialize_todo(todo):
         todo (dict): MongoDB document with ObjectId
         
     Returns:
-        dict: Serialized todo with string ID
+        dict: Serialized todo with string ID (new dict, doesn't mutate original)
     """
-    todo['id'] = str(todo.pop('_id'))
-    return todo
+    # Create a copy to avoid mutating the original document
+    serialized = {k: v for k, v in todo.items() if k != '_id'}
+    serialized['id'] = str(todo['_id'])
+    return serialized
 
 
 def serialize_todos_list(todos_cursor):
@@ -41,7 +50,4 @@ def serialize_todos_list(todos_cursor):
     Returns:
         list: List of serialized todo dictionaries
     """
-    todos_list = []
-    for todo in todos_cursor:
-        todos_list.append(serialize_todo(todo))
-    return todos_list
+    return [serialize_todo(todo) for todo in todos_cursor]

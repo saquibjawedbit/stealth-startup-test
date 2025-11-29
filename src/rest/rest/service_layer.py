@@ -47,7 +47,7 @@ class TodoService:
         
         # Prepare todo document
         todo = todo_input.dict()
-        todo["created_at"] = datetime.utcnow().replace(tzinfo=timezone.utc)
+        todo["created_at"] = datetime.now(timezone.utc)
         
         # Insert into database
         result = self.db.todos.insert_one(todo)
