@@ -2,6 +2,7 @@
 Service layer for business logic operations
 """
 from datetime import datetime, timezone
+from pydantic import ValidationError
 from .util_layer import get_db_connection, serialize_todos_list
 from .model import TodoInput
 
@@ -42,8 +43,8 @@ class TodoService:
         # Validate input
         try:
             todo_input = TodoInput(**todo_data)
-        except Exception as e:
-            raise ValueError(f"Invalid todo data: {str(e)}")
+        except ValidationError as e:
+            raise ValueError(f"Invalid todo data: {e.errors()}")
         
         # Prepare todo document
         todo = todo_input.model_dump()

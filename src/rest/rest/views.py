@@ -24,7 +24,10 @@ class TodoListView(APIView):
             return Response({"todos": todos_list}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.exception("GET /todos failed")
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "An error occurred while retrieving todos"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
     def post(self, request):
         """
@@ -34,9 +37,13 @@ class TodoListView(APIView):
             todo_id = self.todo_service.create_todo(request.data)
             return Response({"id": todo_id}, status=status.HTTP_201_CREATED)
         except ValueError as e:
-            # Validation error
+            # Validation error - safe to return to user
+            logger.warning(f"Validation error in POST /todos: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.exception("POST /todos failed")
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "An error occurred while creating the todo"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
