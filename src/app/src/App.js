@@ -1,5 +1,5 @@
 import './App.css';
-import { useTodos } from './hooks/useTodos';
+import useTodos from './hooks/useTodos';
 
 export function App() {
 
@@ -7,7 +7,11 @@ export function App() {
 
   const handleTodoSubmit = (e) => {
     e.preventDefault();
-    addTodo({ title: e.target.todo.value });
+    try {
+      addTodo({ title: e.target.todo.value });
+    } catch (err) {
+      console.error(err);
+    }
     e.target.todo.value = "";
   };
 
@@ -31,8 +35,8 @@ export function App() {
         <h1>Create a ToDo</h1>
         <form onSubmit={handleTodoSubmit}>
           <div>
-            <label for="todo">ToDo: </label>
-            <input type="text" />
+            <label htmlFor="todo">ToDo: </label>
+            <input type="text" name="todo" />
           </div>
           <div style={{ "marginTop": "5px" }}>
             <button>Add ToDo!</button>
