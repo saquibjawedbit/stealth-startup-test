@@ -7,17 +7,17 @@ export function App() {
   const { todos, loading, error, addTodo } = useTodos();
   const [submitting, setSubmitting] = useState(false);
 
-  const handleTodoSubmit = (e) => {
+  const handleTodoSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      addTodo({ title: e.target.todo.value });
+      await addTodo({ title: e.target.todo.value });
+      e.target.reset();
     } catch (err) {
       console.error(err);
     } finally {
       setSubmitting(false);
     }
-    e.target.reset();
   };
 
   return (
@@ -42,6 +42,7 @@ export function App() {
           <div>
             <label htmlFor="todo">ToDo: </label>
             <input
+              id="todo"
               type="text"
               name="todo"
               required
