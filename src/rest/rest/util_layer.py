@@ -2,25 +2,45 @@
 Utility layer for database connections and data transformations
 """
 import os
+import threading
 from pymongo import MongoClient
 
 
-# Singleton database connection
+# Singleton database connection with thread safety
 _db_instance = None
+_db_lock = threading.Lock()
 
 
 def get_db_connection():
     """
-    Returns a singleton MongoDB database connection
+    Returns a singleton MongoDB database connection (thread-safe)
+    
+    Uses double-check locking pattern to ensure thread safety while
+    minimizing lock contention.
     
     Returns:
         Database: MongoDB database instance
     """
     global _db_instance
+    
+    # First check (without lock for performance)
     if _db_instance is None:
-        mongo_uri = 'mongodb://' + os.environ["MONGO_HOST"] + ':' + os.environ["MONGO_PORT"]
-        client = MongoClient(mongo_uri)
-        _db_instance = client['test_db']
+        # Acquire lock for thread-safe initialization
+        with _db_lock:
+            # Double-check inside lock (another thread might have initialized it)
+            if _db_instance is None:
+                mongo_host = os.environ.get("MONGO_HOST")
+                mongo_port = os.environ.get("MONGO_PORT")
+                
+                if not mongo_host or not mongo_port:
+                    raise ValueError(
+                        "Missing required environment variables: MONGO_HOST and MONGO_PORT must be set"
+                    )
+                
+                mongo_uri = f'mongodb://{mongo_host}:{mongo_port}'
+                client = MongoClient(mongo_uri)
+                _db_instance = client['test_db']
+    
     return _db_instance
 
 
