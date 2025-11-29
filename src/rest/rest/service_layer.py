@@ -46,7 +46,7 @@ class TodoService:
             raise ValueError(f"Invalid todo data: {str(e)}")
         
         # Prepare todo document
-        todo = todo_input.dict()
+        todo = todo_input.model_dump()
         todo["created_at"] = datetime.now(timezone.utc)
         
         # Insert into database
